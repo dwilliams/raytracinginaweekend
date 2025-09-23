@@ -11,4 +11,5 @@ cmake build .
 ToDos
 -----
 
+ * Actually do the things in the book...
  * Make the conanfile.py require C++20
