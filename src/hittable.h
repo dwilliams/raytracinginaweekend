@@ -29,10 +29,10 @@ public:
             normal = outward_normal;
             front_face = true;
         }
-        spdlog::debug("set_face_normal");
-        spdlog::debug(" - r.direction().length(): {}", r.direction().length());
-        spdlog::debug(" - outward_normal.length(): {}", outward_normal.length());
-        spdlog::debug(" - d: {}", d);
+        spdlog::trace("set_face_normal");
+        spdlog::trace(" - r.direction().length(): {}", r.direction().length());
+        spdlog::trace(" - outward_normal.length(): {}", outward_normal.length());
+        spdlog::trace(" - d: {}", d);
     }
 };
 

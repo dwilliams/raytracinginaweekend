@@ -16,14 +16,14 @@ public:
         double c = oc.length_squared() - (radius * radius);
         double discriminant = (h * h) - (a * c);
         
-        spdlog::debug("Sphere - Hit Check:");
-        spdlog::debug(" - center: {}", center.to_string());
-        spdlog::debug(" - radius: {}", radius);
-        spdlog::debug(" - a: {}", a);
-        spdlog::debug(" - h: {}", h);
-        spdlog::debug(" - c: {}", c);
-        spdlog::debug(" - discriminant: {}", discriminant);
-        spdlog::debug(" - r: {}", r.to_string());
+        spdlog::trace("Sphere - Hit Check:");
+        spdlog::trace(" - center: {}", center.to_string());
+        spdlog::trace(" - radius: {}", radius);
+        spdlog::trace(" - a: {}", a);
+        spdlog::trace(" - h: {}", h);
+        spdlog::trace(" - c: {}", c);
+        spdlog::trace(" - discriminant: {}", discriminant);
+        spdlog::trace(" - r: {}", r.to_string());
 
         if (discriminant < 0) {
             return false;
@@ -45,14 +45,14 @@ public:
         Vec3 outward_normal = (rec.p - center) / radius;
         rec.set_face_normal(r, outward_normal);
         
-        spdlog::debug("Hit Detected");
-        spdlog::debug(" - sqrtd: {}", sqrtd);
-        spdlog::debug(" - root: {}", root);
-        spdlog::debug(" - rec.t: {}", rec.t);
-        spdlog::debug(" - rec.p: {}", rec.p.to_string());
-        spdlog::debug(" - outward_normal: {}", outward_normal.to_string());
-        spdlog::debug(" - rec.normal: {}", rec.normal.to_string());
-        spdlog::debug(" - rec.front_face: {}", rec.front_face);
+        spdlog::trace("Hit Detected");
+        spdlog::trace(" - sqrtd: {}", sqrtd);
+        spdlog::trace(" - root: {}", root);
+        spdlog::trace(" - rec.t: {}", rec.t);
+        spdlog::trace(" - rec.p: {}", rec.p.to_string());
+        spdlog::trace(" - outward_normal: {}", outward_normal.to_string());
+        spdlog::trace(" - rec.normal: {}", rec.normal.to_string());
+        spdlog::trace(" - rec.front_face: {}", rec.front_face);
 
         return true;
     }

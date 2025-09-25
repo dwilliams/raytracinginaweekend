@@ -49,7 +49,7 @@ public:
     }
     
     std::string to_string() const {
-        return fmt::format("Vec3{{ {}, {}, {} }}", e[0], e[1], e[2]);
+        return fmt::format("Vec3{{ e[0]: {}, e[1]: {}, e[2]: {} }}", e[0], e[1], e[2]);
     }
 };
 
