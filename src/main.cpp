@@ -1,5 +1,8 @@
+#include <fstream>
 #include <iostream>
 #include <memory>
+
+#include <spdlog/spdlog.h>
 
 #include "rtweekend.h"
 
@@ -24,6 +27,8 @@ Color ray_color(const Ray& r, const Hittable& world) {
 }
 
 int main(void) {
+    // Setup Logging
+    spdlog::set_level(spdlog::level::debug);
 
     // Image
     double aspect_ratio = 16.0 / 9.0;
@@ -57,22 +62,27 @@ int main(void) {
     Point3 pixel_zero_loc = viewport_upper_left + (0.5 * (pixel_delta_u + pixel_delta_v));
 
     // Render
+    // Going to output directly to a file so a logger can be used.
+    std::ofstream image_file;
+    image_file.open("image.ppm");
 
-    std::cout << "P3\n" << image_width << " " << image_height << "\n255\n";
+    image_file << "P3\n" << image_width << " " << image_height << "\n255\n";
 
     for (int j = 0; j < image_height; j++) {
-        std::clog << "\rScanlines Remaining: " << (image_height - j) << " " << std::flush;
+        spdlog::info("Scanlines Remaining: {}", image_height - j);
         for (int i = 0; i < image_width; i++) {
             Point3 pixel_center = pixel_zero_loc + (i * pixel_delta_u) + (j * pixel_delta_v);
             Vec3 ray_direction = pixel_center - camera_center;
             Ray r(camera_center, ray_direction);
 
             Color pixel_color = ray_color(r, world);
-            write_color(std::cout, pixel_color);
+            write_color(image_file, pixel_color);
         }
     }
+    
+    image_file.close();
 
-    std::clog << "\rDone                  \n";
+    spdlog::info("Done");
 
     return 0;
 }

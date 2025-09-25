@@ -8,7 +8,7 @@ class RayTracingInAWeekendRecipe(ConanFile):
     generators = "CMakeToolchain", "CMakeDeps"
 
     def requirements(self):
-        pass
+        self.requires("spdlog/1.15.3")
 
     def layout(self):
         cmake_layout(self)
