@@ -32,7 +32,7 @@ int main(void) {
 
     // Image
     double aspect_ratio = 16.0 / 9.0;
-    int image_width = 1024;
+    int image_width = 256;
 
     int image_height = int(image_width / aspect_ratio);
     image_height = (image_height < 1) ? 1 : image_height;

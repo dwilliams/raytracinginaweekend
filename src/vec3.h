@@ -2,6 +2,9 @@
 
 #include <cmath>
 #include <iostream>
+#include <string>
+
+#include <fmt/format.h>
 
 class Vec3 {
 public:
@@ -43,6 +46,10 @@ public:
 
     double length_squared() const {
         return (e[0] * e[0]) + (e[1] * e[1]) + (e[2] * e[2]);
+    }
+    
+    std::string to_string() const {
+        return fmt::format("Vec3{{ {}, {}, {} }}", e[0], e[1], e[2]);
     }
 };
 

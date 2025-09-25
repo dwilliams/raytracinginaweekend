@@ -1,5 +1,7 @@
 #pragma once
 
+#include <spdlog/spdlog.h>
+
 #include "ray.h"
 #include "vec3.h"
 
@@ -17,8 +19,8 @@ public:
 
         //front_face = dot(r.direction(), outward_normal) < 0;
         //normal = front_face ? outward_normal : -outward_normal;
-        
-        if (dot(r.direction(), outward_normal) > 0.0) {
+        double d = dot(r.direction(), outward_normal);
+        if (d > 0.0) {
             // ray is inside the sphere
             normal = -outward_normal;
             front_face = false;
@@ -27,6 +29,10 @@ public:
             normal = outward_normal;
             front_face = true;
         }
+        spdlog::debug("set_face_normal");
+        spdlog::debug(" - r.direction().length(): {}", r.direction().length());
+        spdlog::debug(" - outward_normal.length(): {}", outward_normal.length());
+        spdlog::debug(" - d: {}", d);
     }
 };
 
