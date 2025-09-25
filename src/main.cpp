@@ -1,23 +1,22 @@
 #include <iostream>
+#include <memory>
+
+#include "rtweekend.h"
 
 #include "color.h"
 #include "ray.h"
 #include "vec3.h"
 
-bool hit_sphere(const Point3& center, double radius, const Ray& r) {
-    Vec3 oc = center - r.origin();
-    double a = dot(r.direction(), r.direction());
-    double b = -2.0 * dot(r.direction(), oc);
-    double c = dot(oc, oc) - (radius * radius);
-    double discriminant = (b * b) - (4 * a * c);
-    return (discriminant >= 0);
-}
+#include "hittable.h"
+#include "hittable_list.h"
+#include "sphere.h"
 
-Color ray_color(const Ray& r) {
-    if (hit_sphere(Point3(0, 0, -1), 0.5, r)) {
-        return Color(1, 0, 0);
+Color ray_color(const Ray& r, const Hittable& world) {
+    HitRecord rec;
+    if (world.hit(r, 0, infinity, rec)) {
+        return 0.5 * (rec.normal + Color(1, 1, 1));
     }
-    
+
     // Background
     Vec3 unit_direction = unit_vector(r.direction());
     double a = 0.5 * (unit_direction.y() + 1.0);
@@ -33,13 +32,17 @@ int main(void) {
     int image_height = int(image_width / aspect_ratio);
     image_height = (image_height < 1) ? 1 : image_height;
 
+    // World
+    HittableList world;
+
+    world.add(std::make_shared<Sphere>(Point3(0, 0, -1), 0.5));
+    world.add(std::make_shared<Sphere>(Point3(0, -100.5, -1), 100));
+
     // Camera
     double focal_length = 1.0;
     double viewport_height = 2.0;
     double viewport_width = viewport_height * ( double(image_width) / image_height);
     Point3 camera_center = Point3(0, 0, 0);
-
-
 
     // Calculate the vectors across the horizontal and down the vertical viewport edges
     Vec3 viewport_u = Vec3(viewport_width, 0, 0);
@@ -60,17 +63,12 @@ int main(void) {
     for (int j = 0; j < image_height; j++) {
         std::clog << "\rScanlines Remaining: " << (image_height - j) << " " << std::flush;
         for (int i = 0; i < image_width; i++) {
-            
             Point3 pixel_center = pixel_zero_loc + (i * pixel_delta_u) + (j * pixel_delta_v);
-            
             Vec3 ray_direction = pixel_center - camera_center;
-            
             Ray r(camera_center, ray_direction);
-            
-            Color pixel_color = ray_color(r);
-            
+
+            Color pixel_color = ray_color(r, world);
             write_color(std::cout, pixel_color);
-            
         }
     }
 
