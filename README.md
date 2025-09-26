@@ -10,7 +10,7 @@ conan install . --build=missing
 
 The command to build:
 ```
-cmake build .
+conan build .
 ```
 
 ToDos
