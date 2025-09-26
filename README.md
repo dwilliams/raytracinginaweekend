@@ -1,7 +1,7 @@
 Ray Tracing In A Weekend Playthrough
 ====================================
 
-Working through the Ray Tracing In A Weekend series.
+Working through the Ray Tracing In A Weekend series (https://raytracing.github.io/).
 
 The command to install dependencies:
 ```

@@ -17,6 +17,7 @@ class Camera {
 public:
     double aspect_ratio = 1.0; // Ratio of image width over height
     int image_width = 100; // Rendered image width in pixel count
+    int samples_per_pixel = 10; // Count of random samples for each pixel
     std::string image_filename = "image.ppm";  // Filename of the output image.
 
     void render(const Hittable& world) {
@@ -31,12 +32,12 @@ public:
         for (int j = 0; j < image_height; j++) {
             spdlog::info("Scanlines Remaining: {}", image_height - j);
             for (int i = 0; i < image_width; i++) {
-                Point3 pixel_center = pixel_zero_loc + (i * pixel_delta_u) + (j * pixel_delta_v);
-                Vec3 ray_direction = pixel_center - center;
-                Ray r(center, ray_direction);
-
-                Color pixel_color = ray_color(r, world);
-                write_color(image_file, pixel_color);
+                Color pixel_color(0, 0, 0);
+                for (int sample = 0; sample < samples_per_pixel; sample++) {
+                    Ray r = get_ray(i, j);
+                    pixel_color += ray_color(r, world);
+                }
+                write_color(image_file, pixel_samples_scale * pixel_color);
             }
         }
         
@@ -47,6 +48,7 @@ public:
 
 private:
     int image_height; // Rendered image height
+    double pixel_samples_scale; // Color scale factor for a sum pf pixel samples
     Point3 center; // Camera center
     Point3 pixel_zero_loc; // Location on pixel 0, 0
     Vec3 pixel_delta_u; // Offset to pixel to the right
@@ -55,6 +57,8 @@ private:
     void initialize() {
         image_height = int(image_width / aspect_ratio);
         image_height = (image_height < 1) ? 1 : image_height;
+
+        pixel_samples_scale = 1.0 / samples_per_pixel;
 
         center = Point3(0, 0, 0);
 
@@ -74,6 +78,24 @@ private:
         // Calculate the location of the upper left pixel
         Point3 viewport_upper_left = center - Vec3(0, 0, focal_length) - (viewport_u / 2) - (viewport_v / 2);
         pixel_zero_loc = viewport_upper_left + (0.5 * (pixel_delta_u + pixel_delta_v));
+    }
+
+    Vec3 sample_square() const {
+        // Returns the vector to a random point in the [-0.5, -0.5] - [+0.5, +0.5] unit square
+        return Vec3(random_double() - 0.5, random_double() - 0.5, 0);
+    }
+
+    Ray get_ray(int i, int j) const {
+        // Construct a camera ray originating from the origin and directed at a randomly sampled
+        // point around the pixel location i, j
+
+        Vec3 offset = sample_square();
+        Point3 pixel_sample = pixel_zero_loc + ((i + offset[0]) * pixel_delta_u) + ((j + offset[1]) * pixel_delta_v);
+
+        Point3 ray_origin = center;
+        Vec3 ray_direction = pixel_sample - ray_origin;
+
+        return Ray(ray_origin, ray_direction);
     }
 
     Color ray_color(const Ray& r, const Hittable& world) const {
