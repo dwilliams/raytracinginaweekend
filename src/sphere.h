@@ -1,14 +1,18 @@
 #pragma once
 
+#include <memory>
+
 #include <spdlog/spdlog.h>
 
+#include "hitrecord.h"
 #include "hittable.h"
 #include "interval.h"
+#include "material.h"
 #include "vec3.h"
 
 class Sphere : public Hittable {
 public:
-    Sphere(const Point3& center, double radius) : center(center), radius(std::fmax(0, radius)) {}
+    Sphere(const Point3& center, double radius, std::shared_ptr<Material> material) : center(center), radius(std::fmax(0, radius)), mat(material) {}
 
     bool hit(const Ray& r, Interval ray_t, HitRecord& rec) const override {
         Vec3 oc = center - r.origin();
@@ -45,6 +49,7 @@ public:
         rec.p = r.at(rec.t);
         Vec3 outward_normal = (rec.p - center) / radius;
         rec.set_face_normal(r, outward_normal);
+        rec.mat = mat;
         
         spdlog::trace("Hit Detected");
         spdlog::trace(" - sqrtd: {}", sqrtd);
@@ -61,4 +66,5 @@ public:
 private:
     Point3 center;
     double radius;
+    std::shared_ptr<Material> mat;
 };
