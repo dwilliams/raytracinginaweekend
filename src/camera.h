@@ -18,6 +18,7 @@ public:
     double aspect_ratio = 1.0; // Ratio of image width over height
     int image_width = 100; // Rendered image width in pixel count
     int samples_per_pixel = 10; // Count of random samples for each pixel
+    int max_depth = 10; // Maximum number of ray bounces into scene
     std::string image_filename = "image.ppm";  // Filename of the output image.
 
     void render(const Hittable& world) {
@@ -35,12 +36,12 @@ public:
                 Color pixel_color(0, 0, 0);
                 for (int sample = 0; sample < samples_per_pixel; sample++) {
                     Ray r = get_ray(i, j);
-                    pixel_color += ray_color(r, world);
+                    pixel_color += ray_color(r, max_depth, world);
                 }
                 write_color(image_file, pixel_samples_scale * pixel_color);
             }
         }
-        
+
         image_file.close();
 
         spdlog::info("Done");
@@ -98,11 +99,18 @@ private:
         return Ray(ray_origin, ray_direction);
     }
 
-    Color ray_color(const Ray& r, const Hittable& world) const {
+    Color ray_color(const Ray& r, int depth, const Hittable& world) const {
+        // If we've exceeded the ray bounce limit, no more light is gathered
+        if (depth <= 0) {
+            return Color(0, 0, 0);
+        }
+
         HitRecord rec;
 
-        if (world.hit(r, Interval(0, infinity), rec)) {
-            return 0.5 * (rec.normal + Color(1, 1, 1));
+        if (world.hit(r, Interval(0.001, infinity), rec)) {
+            //Vec3 direction = random_on_hemisphere(rec.normal);
+            Vec3 direction = rec.normal + random_unit_vector();
+            return 0.5 * ray_color(Ray(rec.p, direction), depth - 1, world);
         }
 
         Vec3 unit_direction = unit_vector(r.direction());
