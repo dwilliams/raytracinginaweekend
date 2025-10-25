@@ -37,6 +37,14 @@ int main(void) {
     world.add(std::make_shared<Sphere>(Point3(-1.0, 0.0, -1.0), 0.4, material_bubble));
     world.add(std::make_shared<Sphere>(Point3(1.0, 0.0, -1.0), 0.5, material_right));
 
+    //double R = std::cos(pi/4);
+
+    //std::shared_ptr<Material> material_left = std::make_shared<Lambertian>(Color(0, 0, 1));
+    //std::shared_ptr<Material> material_right = std::make_shared<Lambertian>(Color(1, 0, 0));
+
+    //world.add(std::make_shared<Sphere>(Point3(-R, 0, -1), R, material_left));
+    //world.add(std::make_shared<Sphere>(Point3(R, 0, -1), R, material_right));
+
     // Camera
     Camera cam;
 
@@ -45,6 +53,10 @@ int main(void) {
     //cam.image_width = 1920;
     cam.samples_per_pixel = 100;
     cam.max_depth = 50;
+    cam.vfov = 20;
+    cam.lookfrom = Point3(-2, 2, 1);
+    cam.lookat = Point3(0, 0, -1);
+    cam.vup = Vec3(0, 1, 0);
 
     cam.render(world);
 
