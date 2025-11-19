@@ -23,9 +23,12 @@ public:
     int max_depth = 10; // Maximum number of ray bounces into scene
 
     double vfov = 90; // Vertical view angle (field of view)
-    Point3 lookfrom = Point3(0, 0, 0);
-    Point3 lookat = Point3(0, 0, -1);
-    Vec3 vup = Vec3(0, 1, 0);
+    Point3 lookfrom = Point3(0, 0, 0); // Point the camera is looking from (camera location)
+    Point3 lookat = Point3(0, 0, -1); // Point the camera is looking at (camera direction)
+    Vec3 vup = Vec3(0, 1, 0); // Camera-relative "up" direction (camera orientation)
+
+    double defocus_angle = 0; // Variation angle of rays through each pixel
+    double focus_distance = 10; // Distance from camera lookfrom point to plane of perfect focus
 
     std::string image_filename = "image.ppm";  // Filename of the output image.
 
@@ -65,6 +68,8 @@ private:
     Vec3 u; // Camera from basis vectors
     Vec3 v;
     Vec3 w;
+    Vec3 defocus_disk_u; // Defocus disk horizontal radius
+    Vec3 defocus_disk_v; // Defocus disk vertical radius
 
     void initialize() {
         image_height = int(image_width / aspect_ratio);
@@ -75,10 +80,9 @@ private:
         center = lookfrom;
 
         // Determine viewport dimensions
-        double focal_length = (lookfrom - lookat).length();
         double theta = degrees_to_radians(vfov);
         double h = std::tan(theta / 2);
-        double viewport_height = 2 * h * focal_length;
+        double viewport_height = 2 * h * focus_distance;
         double viewport_width = viewport_height * (double(image_width) / image_height);
 
         // Calculate the u, v, w unit basis vectors for the camera coordinate frame
@@ -95,8 +99,13 @@ private:
         pixel_delta_v = viewport_v / image_height;
 
         // Calculate the location of the upper left pixel
-        Point3 viewport_upper_left = center - (focal_length * w) - (viewport_u / 2) - (viewport_v / 2);
+        Point3 viewport_upper_left = center - (focus_distance * w) - (viewport_u / 2) - (viewport_v / 2);
         pixel_zero_loc = viewport_upper_left + (0.5 * (pixel_delta_u + pixel_delta_v));
+        
+        // Calculate the camera defocus dosk basis vectors
+        double defocus_radius = focus_distance * std::tan(degrees_to_radians(defocus_angle / 2));
+        defocus_disk_u = u * defocus_radius;
+        defocus_disk_v = v * defocus_radius;
     }
 
     Vec3 sample_square() const {
@@ -105,16 +114,22 @@ private:
     }
 
     Ray get_ray(int i, int j) const {
-        // Construct a camera ray originating from the origin and directed at a randomly sampled
+        // Construct a camera ray originating from the defocus disk and directed at a randomly sampled
         // point around the pixel location i, j
 
         Vec3 offset = sample_square();
         Point3 pixel_sample = pixel_zero_loc + ((i + offset[0]) * pixel_delta_u) + ((j + offset[1]) * pixel_delta_v);
 
-        Point3 ray_origin = center;
+        Point3 ray_origin = (defocus_angle <= 0) ? center : defocus_disk_sample();
         Vec3 ray_direction = pixel_sample - ray_origin;
 
         return Ray(ray_origin, ray_direction);
+    }
+
+    Point3 defocus_disk_sample() const {
+        // Returns a random point in the camera defocus disk
+        Vec3 p = random_in_unit_disk();
+        return center + (p[0] * defocus_disk_u) + (p[1] * defocus_disk_v);
     }
 
     Color ray_color(const Ray& r, int depth, const Hittable& world) const {
