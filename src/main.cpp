@@ -62,8 +62,9 @@ int main(void) {
                 if (choose_mat < 0.8) {
                     // diffuse
                     Color albedo = Color::random() * Color::random();
+                    Point3 center2 = center + Vec3(0, random_double(0, 0.5), 0);
                     sphere_material = std::make_shared<Lambertian>(albedo);
-                    world.add(std::make_shared<Sphere>(center, 0.2, sphere_material));
+                    world.add(std::make_shared<Sphere>(center, center2, 0.2, sphere_material));
                 } else if (choose_mat < 0.95) {
                     // metal
                     Color albedo = Color::random(0.5, 1);

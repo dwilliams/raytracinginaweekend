@@ -13,7 +13,7 @@ public:
     bool scatter(const Ray& r_in, const HitRecord& rec, Color& attenuation, Ray& scattered) const override {
         Vec3 reflected = reflect(r_in.direction(), rec.normal);
         reflected = unit_vector(reflected) + (fuzz * random_unit_vector());
-        scattered = Ray(rec.p, reflected);
+        scattered = Ray(rec.p, reflected, r_in.time());
         attenuation = albedo;
         return (dot(scattered.direction(), rec.normal) > 0);
     }
