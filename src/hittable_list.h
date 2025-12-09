@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 
+#include "aabb.h"
 #include "hittable.h"
 #include "interval.h"
 #include "ray.h"
@@ -18,6 +19,7 @@ public:
 
     void add(std::shared_ptr<Hittable> object) {
         objects.push_back(object);
+        bbox = AABB(bbox, object->bounding_box());
     }
 
     bool hit(const Ray& r, Interval ray_t, HitRecord& rec) const override {
@@ -35,4 +37,9 @@ public:
 
         return hit_anything;
     }
+
+    AABB bounding_box() const override { return bbox; }
+
+private:
+    AABB bbox;
 };

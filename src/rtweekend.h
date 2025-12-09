@@ -34,3 +34,8 @@ inline double random_double(double min, double max) {
     // Return a random real in [min, max)
     return min + ((max - min) * random_double());
 }
+
+inline int random_int(int min, int max) {
+    // Return a random integrer in [min, max].
+    return int(random_double(min, max + 1));
+}

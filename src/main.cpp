@@ -6,6 +6,7 @@
 
 #include "rtweekend.h"
 
+#include "bvh.h"
 #include "camera.h"
 #include "dielectric.h"
 #include "hittable.h"
@@ -88,6 +89,8 @@ int main(void) {
 
     std::shared_ptr<Material> material3 = std::make_shared<Metal>(Color(0.7, 0.6, 0.5), 0.0);
     world.add(std::make_shared<Sphere>(Point3(4, 1, 0), 1.0, material3));
+
+    world = HittableList(std::make_shared<BvhNode>(world));
 
     // Camera
     Camera cam;
