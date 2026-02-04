@@ -12,6 +12,7 @@
 #include "dielectric.h"
 #include "hittable.h"
 #include "hittable_list.h"
+#include "image_texture.h"
 #include "lambertian.h"
 #include "material.h"
 #include "metal.h"
@@ -137,6 +138,28 @@ void checkered_spheres() {
     cam.render(world);
 }
 
+void earth() {
+    std::shared_ptr<Texture> earth_texture = std::make_shared<ImageTexture>("earthmap.jpg");
+    std::shared_ptr<Lambertian> earth_surface = std::make_shared<Lambertian>(earth_texture);
+    std::shared_ptr<Sphere> globe = std::make_shared<Sphere>(Point3(0, 0, 0), 2, earth_surface);
+
+    Camera cam;
+
+    cam.aspect_ratio = 16.0 / 9.0;
+    cam.image_width = 256;
+    cam.samples_per_pixel = 100;
+    cam.max_depth = 50;
+
+    cam.vfov = 20;
+    cam.lookfrom = Point3(0, 0, 12);
+    cam.lookat = Point3(0, 0, 0);
+    cam.vup = Vec3(0, 1, 0);
+
+    cam.defocus_angle = 0;
+
+    cam.render(HittableList(globe));
+}
+
 int main(void) {
     // Parse Command Arguments
 
@@ -144,9 +167,10 @@ int main(void) {
     spdlog::set_level(spdlog::level::debug);
 
     // Run the tracer
-    switch (2) {
+    switch (3) {
         case 1: bouncing_spheres(); break;
         case 2: checkered_spheres(); break;
+        case 3: earth(); break;
     }
 
     return 0;

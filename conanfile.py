@@ -10,6 +10,7 @@ class RayTracingInAWeekendRecipe(ConanFile):
     def requirements(self):
         self.requires("fmt/11.2.0")
         self.requires("spdlog/1.15.3")
+        self.requires("stb/cci.20240531")
 
     def layout(self):
         cmake_layout(self)
