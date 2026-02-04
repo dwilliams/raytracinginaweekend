@@ -19,13 +19,7 @@
 #include "texture.h"
 #include "vec3.h"
 
-int main(void) {
-    // Parse Command Arguments
-
-    // Setup Logging
-    spdlog::set_level(spdlog::level::debug);
-
-    // World
+void bouncing_spheres() {
     HittableList world;
 
     // --- Three Sphere Render
@@ -116,6 +110,44 @@ int main(void) {
     cam.focus_distance = 10.0;
 
     cam.render(world);
+}
+
+void checkered_spheres() {
+    HittableList world;
+
+    std::shared_ptr<Texture> checker = std::make_shared<CheckerTexture>(0.32, Color(0.2, 0.3, 0.1), Color(0.9, 0.9, 0.9));
+
+    world.add(std::make_shared<Sphere>(Point3(0, -10, 0), 10, std::make_shared<Lambertian>(checker)));
+    world.add(std::make_shared<Sphere>(Point3(0, 10, 0), 10, std::make_shared<Lambertian>(checker)));
+
+    Camera cam;
+
+    cam.aspect_ratio = 16.0 / 9.0;
+    cam.image_width = 256;
+    cam.samples_per_pixel = 100;
+    cam.max_depth = 50;
+
+    cam.vfov = 20;
+    cam.lookfrom = Point3(13, 2, 3);
+    cam.lookat = Point3(0, 0, 0);
+    cam.vup = Vec3(0, 1, 0);
+
+    cam.defocus_angle = 0;
+
+    cam.render(world);
+}
+
+int main(void) {
+    // Parse Command Arguments
+
+    // Setup Logging
+    spdlog::set_level(spdlog::level::debug);
+
+    // Run the tracer
+    switch (2) {
+        case 1: bouncing_spheres(); break;
+        case 2: checkered_spheres(); break;
+    }
 
     return 0;
 }
