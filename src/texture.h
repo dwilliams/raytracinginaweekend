@@ -1,0 +1,10 @@
+#pragma once
+
+#include "color.h"
+#include "vec3.h"
+
+class Texture {
+public:
+    virtual ~Texture() = default;
+    virtual Color value(double u, double v, const Point3& p) const = 0;
+};

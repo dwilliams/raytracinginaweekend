@@ -8,6 +8,7 @@
 
 #include "bvh.h"
 #include "camera.h"
+#include "checker_texture.h"
 #include "dielectric.h"
 #include "hittable.h"
 #include "hittable_list.h"
@@ -15,6 +16,7 @@
 #include "material.h"
 #include "metal.h"
 #include "sphere.h"
+#include "texture.h"
 #include "vec3.h"
 
 int main(void) {
@@ -49,8 +51,12 @@ int main(void) {
     //world.add(std::make_shared<Sphere>(Point3(R, 0, -1), R, material_right));
 
     // --- Final Render
-    std::shared_ptr<Material> ground_material = std::make_shared<Lambertian>(Color(0.5, 0.5, 0.5));
-    world.add(std::make_shared<Sphere>(Point3(0, -1000, 0), 1000, ground_material));
+    //std::shared_ptr<Material> ground_material = std::make_shared<Lambertian>(Color(0.5, 0.5, 0.5));
+    //world.add(std::make_shared<Sphere>(Point3(0, -1000, 0), 1000, ground_material));
+
+    // --- Checker Render
+    std::shared_ptr<Texture> checker = std::make_shared<CheckerTexture>(0.32, Color(0.2, 0.3, 0.1), Color(0.9, 0.9, 0.9));
+    world.add(std::make_shared<Sphere>(Point3(0, -1000, 0), 1000, std::make_shared<Lambertian>(checker)));
 
     for (int a = -11; a < 11; a++) {
         for (int b = -11; b < 11; b++) {
