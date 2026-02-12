@@ -19,6 +19,9 @@ public:
         double u = p.x() - std::floor(p.x());
         double v = p.y() - std::floor(p.y());
         double w = p.z() - std::floor(p.z());
+        u = u * u * (3 - (2 * u));
+        v = v * v * (3 - (2 * v));
+        w = w * w * (3 - (2 * w));
 
         int i = int(std::floor(p.x()));
         int j = int(std::floor(p.y()));
