@@ -16,6 +16,7 @@
 #include "lambertian.h"
 #include "material.h"
 #include "metal.h"
+#include "noise_texture.h"
 #include "sphere.h"
 #include "texture.h"
 #include "vec3.h"
@@ -98,7 +99,7 @@ void bouncing_spheres() {
 
     cam.aspect_ratio = 16.0 / 9.0;
     cam.image_width = 256;
-    //cam.image_width = 1920;
+    //cam.image_width = 19200;
     cam.samples_per_pixel = 100;
     cam.max_depth = 50;
     
@@ -160,6 +161,30 @@ void earth() {
     cam.render(HittableList(globe));
 }
 
+void perlin_spheres() {
+    HittableList world;
+
+    std::shared_ptr<Texture> pertext = std::make_shared<NoiseTexture>();
+    world.add(std::make_shared<Sphere>(Point3(0, -1000, 0), 1000, std::make_shared<Lambertian>(pertext)));
+    world.add(std::make_shared<Sphere>(Point3(0, 2, 0), 2, std::make_shared<Lambertian>(pertext)));
+
+    Camera cam;
+
+    cam.aspect_ratio = 16.0 / 9.0;
+    cam.image_width = 256;
+    cam.samples_per_pixel = 100;
+    cam.max_depth = 50;
+
+    cam.vfov = 20;
+    cam.lookfrom = Point3(13, 2, 3);
+    cam.lookat = Point3(0, 0, 0);
+    cam.vup = Vec3(0, 1, 0);
+
+    cam.defocus_angle = 0;
+
+    cam.render(HittableList(world));
+}
+
 int main(void) {
     // Parse Command Arguments
 
@@ -167,10 +192,11 @@ int main(void) {
     spdlog::set_level(spdlog::level::debug);
 
     // Run the tracer
-    switch (3) {
+    switch (4) {
         case 1: bouncing_spheres(); break;
         case 2: checkered_spheres(); break;
         case 3: earth(); break;
+        case 4: perlin_spheres(); break;
     }
 
     return 0;
