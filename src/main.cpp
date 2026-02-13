@@ -17,6 +17,7 @@
 #include "material.h"
 #include "metal.h"
 #include "noise_texture.h"
+#include "quad.h"
 #include "sphere.h"
 #include "texture.h"
 #include "vec3.h"
@@ -141,7 +142,7 @@ void checkered_spheres() {
 
 void earth() {
     std::shared_ptr<Texture> earth_texture = std::make_shared<ImageTexture>("earthmap.jpg");
-    std::shared_ptr<Lambertian> earth_surface = std::make_shared<Lambertian>(earth_texture);
+    std::shared_ptr<Material> earth_surface = std::make_shared<Lambertian>(earth_texture);
     std::shared_ptr<Sphere> globe = std::make_shared<Sphere>(Point3(0, 0, 0), 2, earth_surface);
 
     Camera cam;
@@ -182,7 +183,41 @@ void perlin_spheres() {
 
     cam.defocus_angle = 0;
 
-    cam.render(HittableList(world));
+    cam.render(world);
+}
+
+void quads() {
+    HittableList world;
+
+    // Materials
+    std::shared_ptr<Material> left_red = std::make_shared<Lambertian>(Color(1.0, 0.2, 0.2));
+    std::shared_ptr<Material> back_green = std::make_shared<Lambertian>(Color(0.2, 1.0, 0.2));
+    std::shared_ptr<Material> right_blue = std::make_shared<Lambertian>(Color(0.2, 0.2, 1.0));
+    std::shared_ptr<Material> upper_orange = std::make_shared<Lambertian>(Color(1.0, 0.5, 0.0));
+    std::shared_ptr<Material> lower_teal = std::make_shared<Lambertian>(Color(0.2, 0.8, 0.8));
+
+    // Quads
+    world.add(std::make_shared<Quad>(Point3(-3,-2, 5), Vec3(0, 0,-4), Vec3(0, 4, 0), left_red));
+    world.add(std::make_shared<Quad>(Point3(-2,-2, 0), Vec3(4, 0, 0), Vec3(0, 4, 0), back_green));
+    world.add(std::make_shared<Quad>(Point3( 3,-2, 1), Vec3(0, 0, 4), Vec3(0, 4, 0), right_blue));
+    world.add(std::make_shared<Quad>(Point3(-2, 3, 1), Vec3(4, 0, 0), Vec3(0, 0, 4), upper_orange));
+    world.add(std::make_shared<Quad>(Point3(-2,-3, 5), Vec3(4, 0, 0), Vec3(0, 0,-4), lower_teal));
+
+    Camera cam;
+
+    cam.aspect_ratio = 16.0 / 9.0;
+    cam.image_width = 256;
+    cam.samples_per_pixel = 100;
+    cam.max_depth = 50;
+
+    cam.vfov = 80;
+    cam.lookfrom = Point3(0,0,9);
+    cam.lookat = Point3(0,0,0);
+    cam.vup = Vec3(0,1,0);
+
+    cam.defocus_angle = 0;
+
+    cam.render(world);
 }
 
 int main(void) {
@@ -192,11 +227,12 @@ int main(void) {
     spdlog::set_level(spdlog::level::debug);
 
     // Run the tracer
-    switch (4) {
+    switch (5) {
         case 1: bouncing_spheres(); break;
         case 2: checkered_spheres(); break;
         case 3: earth(); break;
         case 4: perlin_spheres(); break;
+        case 5: quads(); break;
     }
 
     return 0;
