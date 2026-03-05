@@ -10,6 +10,7 @@
 #include "camera.h"
 #include "checker_texture.h"
 #include "dielectric.h"
+#include "diffuse_light.h"
 #include "hittable.h"
 #include "hittable_list.h"
 #include "image_texture.h"
@@ -103,7 +104,8 @@ void bouncing_spheres() {
     //cam.image_width = 19200;
     cam.samples_per_pixel = 100;
     cam.max_depth = 50;
-    
+    cam.background = Color(0.70, 0.80, 1.00);
+
     cam.vfov = 20;
     cam.lookfrom = Point3(13, 2, 3);
     cam.lookat = Point3(0, 0, 0);
@@ -129,6 +131,7 @@ void checkered_spheres() {
     cam.image_width = 256;
     cam.samples_per_pixel = 100;
     cam.max_depth = 50;
+    cam.background = Color(0.70, 0.80, 1.00);
 
     cam.vfov = 20;
     cam.lookfrom = Point3(13, 2, 3);
@@ -151,6 +154,7 @@ void earth() {
     cam.image_width = 256;
     cam.samples_per_pixel = 100;
     cam.max_depth = 50;
+    cam.background = Color(0.70, 0.80, 1.00);
 
     cam.vfov = 20;
     cam.lookfrom = Point3(0, 0, 12);
@@ -175,6 +179,7 @@ void perlin_spheres() {
     cam.image_width = 256;
     cam.samples_per_pixel = 100;
     cam.max_depth = 50;
+    cam.background = Color(0.70, 0.80, 1.00);
 
     cam.vfov = 20;
     cam.lookfrom = Point3(13, 2, 3);
@@ -209,11 +214,41 @@ void quads() {
     cam.image_width = 256;
     cam.samples_per_pixel = 100;
     cam.max_depth = 50;
+    cam.background = Color(0.70, 0.80, 1.00);
 
     cam.vfov = 80;
     cam.lookfrom = Point3(0,0,9);
     cam.lookat = Point3(0,0,0);
     cam.vup = Vec3(0,1,0);
+
+    cam.defocus_angle = 0;
+
+    cam.render(world);
+}
+
+void simple_light() {
+    HittableList world;
+
+    std::shared_ptr<NoiseTexture> pertext = std::make_shared<NoiseTexture>(4);
+    world.add(std::make_shared<Sphere>(Point3(0, -1000, 0), 1000, std::make_shared<Lambertian>(pertext)));
+    world.add(std::make_shared<Sphere>(Point3(0, 2, 0), 2, std::make_shared<Lambertian>(pertext)));
+
+    std::shared_ptr<DiffuseLight> difflight = std::make_shared<DiffuseLight>(Color(4, 4, 4));
+    world.add(std::make_shared<Sphere>(Point3(0, 7, 0), 2, difflight));
+    world.add(std::make_shared<Quad>(Point3(3, 1, -2), Vec3(2, 0, 0), Vec3(0, 2, 0), difflight));
+
+    Camera cam;
+
+    cam.aspect_ratio = 16.0 / 9.0;
+    cam.image_width = 256;
+    cam.samples_per_pixel = 100;
+    cam.max_depth = 50;
+    cam.background = Color(0, 0, 0);
+
+    cam.vfov = 20;
+    cam.lookfrom = Point3(26, 3, 6);
+    cam.lookat = Point3(0, 2, 0);
+    cam.vup = Vec3(0, 1, 0);
 
     cam.defocus_angle = 0;
 
@@ -227,12 +262,13 @@ int main(void) {
     spdlog::set_level(spdlog::level::debug);
 
     // Run the tracer
-    switch (5) {
+    switch (6) {
         case 1: bouncing_spheres(); break;
         case 2: checkered_spheres(); break;
         case 3: earth(); break;
         case 4: perlin_spheres(); break;
         case 5: quads(); break;
+        case 6: simple_light(); break;
     }
 
     return 0;
