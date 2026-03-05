@@ -255,6 +255,39 @@ void simple_light() {
     cam.render(world);
 }
 
+void cornell_box() {
+    HittableList world;
+
+    std::shared_ptr<Lambertian> red = std::make_shared<Lambertian>(Color(0.65, 0.05, 0.05));
+    std::shared_ptr<Lambertian> white = std::make_shared<Lambertian>(Color(0.73, 0.73, 0.73));
+    std::shared_ptr<Lambertian> green = std::make_shared<Lambertian>(Color(0.12, 0.45, 0.15));
+    std::shared_ptr<DiffuseLight> light = std::make_shared<DiffuseLight>(Color(15, 15, 15));
+
+    world.add(std::make_shared<Quad>(Point3(555, 0, 0), Vec3(0, 555, 0), Vec3(0, 0, 555), green));
+    world.add(std::make_shared<Quad>(Point3(0, 0, 0), Vec3(0, 555, 0), Vec3(0, 0, 555), red));
+    world.add(std::make_shared<Quad>(Point3(343, 554, 332), Vec3(-130, 0, 0), Vec3(0, 0, -105), light));
+    world.add(std::make_shared<Quad>(Point3(0, 0, 0), Vec3(555, 0, 0), Vec3(0, 0, 555), white));
+    world.add(std::make_shared<Quad>(Point3(555, 555, 555), Vec3(-555, 0, 0), Vec3(0, 0, -555), white));
+    world.add(std::make_shared<Quad>(Point3(0, 0, 555), Vec3(555, 0, 0), Vec3(0, 555, 0), white));
+
+    Camera cam;
+
+    cam.aspect_ratio = 16.0 / 9.0;
+    cam.image_width = 256;
+    cam.samples_per_pixel = 100;
+    cam.max_depth = 50;
+    cam.background = Color(0, 0, 0);
+
+    cam.vfov = 40;
+    cam.lookfrom = Point3(278, 278, -800);
+    cam.lookat = Point3(278, 278, 0);
+    cam.vup = Vec3(0, 1, 0);
+
+    cam.defocus_angle = 0;
+
+    cam.render(world);
+}
+
 int main(void) {
     // Parse Command Arguments
 
@@ -262,13 +295,14 @@ int main(void) {
     spdlog::set_level(spdlog::level::debug);
 
     // Run the tracer
-    switch (6) {
+    switch (7) {
         case 1: bouncing_spheres(); break;
         case 2: checkered_spheres(); break;
         case 3: earth(); break;
         case 4: perlin_spheres(); break;
         case 5: quads(); break;
         case 6: simple_light(); break;
+        case 7: cornell_box(); break;
     }
 
     return 0;
