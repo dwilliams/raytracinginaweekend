@@ -19,8 +19,10 @@
 #include "metal.h"
 #include "noise_texture.h"
 #include "quad.h"
+#include "rotate_y.h"
 #include "sphere.h"
 #include "texture.h"
+#include "translate.h"
 #include "vec3.h"
 
 void bouncing_spheres() {
@@ -270,9 +272,22 @@ void cornell_box() {
     world.add(std::make_shared<Quad>(Point3(555, 555, 555), Vec3(-555, 0, 0), Vec3(0, 0, -555), white));
     world.add(std::make_shared<Quad>(Point3(0, 0, 555), Vec3(555, 0, 0), Vec3(0, 555, 0), white));
 
+    //world.add(box(Point3(130, 0, 65), Point3(295, 165, 230), white));
+    //world.add(box(Point3(265, 9, 295), Point3(430, 330, 460), white));
+
+    std::shared_ptr<Hittable> box1 = box(Point3(0, 0, 0), Point3(165, 330, 165), white);
+    box1 = std::make_shared<RotateY>(box1, 15);
+    box1 = std::make_shared<Translate>(box1, Vec3(265, 0, 295));
+    world.add(box1);
+
+    std::shared_ptr<Hittable> box2 = box(Point3(0, 0, 0), Point3(165, 165, 165), white);
+    box2 = std::make_shared<RotateY>(box2, -18);
+    box2 = std::make_shared<Translate>(box2, Vec3(130, 0, 65));
+    world.add(box2);
+
     Camera cam;
 
-    cam.aspect_ratio = 16.0 / 9.0;
+    cam.aspect_ratio = 1.0;
     cam.image_width = 256;
     cam.samples_per_pixel = 100;
     cam.max_depth = 50;
