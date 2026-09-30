@@ -349,6 +349,78 @@ void cornell_smoke() {
     cam.render(world);
 }
 
+void final_scene(int image_width, int samples_per_pixel, int max_depth) {
+    HittableList boxes1;
+    std::shared_ptr<Material> ground = std::make_shared<Lambertian>(Color(0.48, 0.83, 0.53));
+
+    int boxes_per_side = 20;
+    for (int i = 0; i < boxes_per_side; i++) {
+        for (int j = 0; j < boxes_per_side; j++) {
+            double w = 100.0;
+            double x0 = -1000.0 + (i * w);
+            double y0 = 0.0;
+            double z0 = -1000.0 + (j * w);
+            double x1 = x0 + w;
+            double y1 = random_double(1.0, 101.0);
+            double z1 = z0 + w;
+
+            boxes1.add(box(Point3(x0, y0, z0), Point3(x1, y1, z1), ground));
+        }
+    }
+
+    HittableList world;
+
+    world.add(std::make_shared<BvhNode>(boxes1));
+
+    std::shared_ptr<Material> light = std::make_shared<DiffuseLight>(Color(7, 7, 7));
+    world.add(std::make_shared<Quad>(Point3(123, 554, 147), Vec3(300, 0, 0), Vec3(0, 0, 265), light));
+
+    Point3 center1 = Point3(400, 400, 200);
+    Point3 center2 = center1 + Vec3(30, 0, 0);
+    std::shared_ptr<Material> sphere_material = std::make_shared<Lambertian>(Color(0.7, 0.3, 0.1));
+    world.add(std::make_shared<Sphere>(center1, center2, 50, sphere_material));
+
+    world.add(std::make_shared<Sphere>(Point3(260, 150, 45), 50, std::make_shared<Dielectric>(1.5)));
+    world.add(std::make_shared<Sphere>(Point3(0, 150, 145), 50, std::make_shared<Metal>(Color(0.8, 0.8, 0.9), 1.0)));
+
+    std::shared_ptr<Sphere> boundary = std::make_shared<Sphere>(Point3(360, 150, 145), 70, std::make_shared<Dielectric>(1.5));
+    world.add(boundary);
+    world.add(std::make_shared<ConstantMedium>(boundary, 0.2, Color(0.2, 0.4, 0.9)));
+    boundary = std::make_shared<Sphere>(Point3(0, 0, 0), 5000, std::make_shared<Dielectric>(1.5));
+    world.add(std::make_shared<ConstantMedium>(boundary, 0.0001, Color(1, 1, 1)));
+
+    std::shared_ptr<Material> emat = std::make_shared<Lambertian>(std::make_shared<ImageTexture>("earthmap.jpg"));
+    world.add(std::make_shared<Sphere>(Point3(400, 200, 400), 100, emat));
+    std::shared_ptr<Material> pertext = std::make_shared<Lambertian>(std::make_shared<NoiseTexture>(0.2));
+    world.add(std::make_shared<Sphere>(Point3(220, 280, 300), 80, pertext));
+
+    HittableList boxes2;
+    std::shared_ptr<Material> white = std::make_shared<Lambertian>(Color(0.73, 0.73, 0.73));
+    int ns = 1000;
+    for (int i = 0; i < ns; i++) {
+        boxes2.add(std::make_shared<Sphere>(Point3::random(0, 165), 10, white));
+    }
+
+    world.add(std::make_shared<Translate>(std::make_shared<RotateY>(std::make_shared<BvhNode>(boxes2), 15), Vec3(-100, 270, 395)));
+
+    Camera cam;
+
+    cam.aspect_ratio = 1.0;
+    cam.image_width = image_width;
+    cam.samples_per_pixel = samples_per_pixel;
+    cam.max_depth = max_depth;
+    cam.background = Color(0, 0, 0);
+
+    cam.vfov = 40;
+    cam.lookfrom = Point3(478, 278, -600);
+    cam.lookat = Point3(278, 278, 0);
+    cam.vup = Vec3(0, 1, 0);
+
+    cam.defocus_angle = 0;
+
+    cam.render(world);
+}
+
 int main(void) {
     // Parse Command Arguments
 
@@ -359,7 +431,7 @@ int main(void) {
     std::chrono::time_point<std::chrono::high_resolution_clock> start = std::chrono::high_resolution_clock::now();
 
     // Run the tracer
-    switch (8) {
+    switch (9) {
         case 1: bouncing_spheres(); break;
         case 2: checkered_spheres(); break;
         case 3: earth(); break;
@@ -368,7 +440,8 @@ int main(void) {
         case 6: simple_light(); break;
         case 7: cornell_box(); break;
         case 8: cornell_smoke(); break;
-        default: break;
+        case 9: final_scene(800, 10000, 40); break;
+        default: final_scene(400, 250, 4); break;
     }
 
     // Record the end time
