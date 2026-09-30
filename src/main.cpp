@@ -1,3 +1,4 @@
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -9,6 +10,7 @@
 #include "bvh.h"
 #include "camera.h"
 #include "checker_texture.h"
+#include "constant_medium.h"
 #include "dielectric.h"
 #include "diffuse_light.h"
 #include "hittable.h"
@@ -303,14 +305,61 @@ void cornell_box() {
     cam.render(world);
 }
 
+void cornell_smoke() {
+    HittableList world;
+
+    std::shared_ptr<Lambertian> red = std::make_shared<Lambertian>(Color(0.65, 0.05, 0.05));
+    std::shared_ptr<Lambertian> white = std::make_shared<Lambertian>(Color(0.73, 0.73, 0.73));
+    std::shared_ptr<Lambertian> green = std::make_shared<Lambertian>(Color(0.12, 0.45, 0.15));
+    std::shared_ptr<DiffuseLight> light = std::make_shared<DiffuseLight>(Color(7, 7, 7));
+
+    world.add(std::make_shared<Quad>(Point3(555, 0, 0), Vec3(0, 555, 0), Vec3(0, 0, 555), green));
+    world.add(std::make_shared<Quad>(Point3(0, 0, 0), Vec3(0, 555, 0), Vec3(0, 0, 555), red));
+    world.add(std::make_shared<Quad>(Point3(113, 554, 127), Vec3(330, 0, 0), Vec3(0, 0, 305), light));
+    world.add(std::make_shared<Quad>(Point3(0, 555, 0), Vec3(555, 0, 0), Vec3(0, 0, 555), white));
+    world.add(std::make_shared<Quad>(Point3(0, 0, 0), Vec3(555, 0, 0), Vec3(0, 0, 555), white));
+    world.add(std::make_shared<Quad>(Point3(0, 0, 555), Vec3(555, 0, 0), Vec3(0, 555, 0), white));
+
+    std::shared_ptr<Hittable> box1 = box(Point3(0, 0, 0), Point3(165, 330, 165), white);
+    box1 = std::make_shared<RotateY>(box1, 15);
+    box1 = std::make_shared<Translate>(box1, Vec3(265, 0, 295));
+
+    std::shared_ptr<Hittable> box2 = box(Point3(0, 0, 0), Point3(165, 165, 165), white);
+    box2 = std::make_shared<RotateY>(box2, -18);
+    box2 = std::make_shared<Translate>(box2, Vec3(130, 0, 65));
+
+    world.add(std::make_shared<ConstantMedium>(box1, 0.01, Color(0, 0, 0)));
+    world.add(std::make_shared<ConstantMedium>(box2, 0.01, Color(1, 1, 1)));
+
+    Camera cam;
+
+    cam.aspect_ratio = 1.0;
+    cam.image_width = 600;
+    cam.samples_per_pixel = 200;
+    cam.max_depth = 50;
+    cam.background = Color(0, 0, 0);
+
+    cam.vfov = 40;
+    cam.lookfrom = Point3(278, 278, -800);
+    cam.lookat = Point3(278, 278, 0);
+    cam.vup = Vec3(0, 1, 0);
+
+    cam.defocus_angle = 0;
+
+    cam.render(world);
+}
+
 int main(void) {
     // Parse Command Arguments
 
     // Setup Logging
     spdlog::set_level(spdlog::level::debug);
 
+    // Record the start time
+    std::chrono::time_point<std::chrono::high_resolution_clock> start = std::chrono::high_resolution_clock::now();
+
     // Run the tracer
-    switch (7) {
+    switch (8) {
         case 1: bouncing_spheres(); break;
         case 2: checkered_spheres(); break;
         case 3: earth(); break;
@@ -318,7 +367,18 @@ int main(void) {
         case 5: quads(); break;
         case 6: simple_light(); break;
         case 7: cornell_box(); break;
+        case 8: cornell_smoke(); break;
+        default: break;
     }
+
+    // Record the end time
+    std::chrono::time_point<std::chrono::high_resolution_clock> end = std::chrono::high_resolution_clock::now();
+
+    // Log the execution time
+    std::chrono::duration<double> exec_time = end - start;
+    ulong exec_seconds = std::chrono::duration_cast<std::chrono::seconds>(exec_time).count();
+
+    spdlog::info("Execution Time: {} hours {} minutes {} seconds", exec_seconds / 3600, (exec_seconds % 3600) / 60, exec_seconds % 60);
 
     return 0;
 }
