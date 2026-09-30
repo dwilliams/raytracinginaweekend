@@ -2,7 +2,7 @@
 
 #include "aabb.h"
 #include "hittable.h"
-#include "hitrecord.h"
+#include "hit_record.h"
 #include "interval.h"
 #include "ray.h"
 #include "rtweekend.h"

@@ -5,7 +5,7 @@
 #include <spdlog/spdlog.h>
 
 #include "aabb.h"
-#include "hitrecord.h"
+#include "hit_record.h"
 #include "hittable.h"
 #include "interval.h"
 #include "material.h"

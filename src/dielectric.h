@@ -1,7 +1,7 @@
 #pragma once
 
 #include "color.h"
-#include "hitrecord.h"
+#include "hit_record.h"
 #include "material.h"
 #include "ray.h"
 

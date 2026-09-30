@@ -8,7 +8,7 @@
 #include "rtweekend.h"
 
 #include "color.h"
-#include "hitrecord.h"
+#include "hit_record.h"
 #include "hittable.h"
 #include "interval.h"
 #include "material.h"

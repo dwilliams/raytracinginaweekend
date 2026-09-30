@@ -2,7 +2,7 @@
 
 #include "aabb.h"
 #include "interval.h"
-#include "hitrecord.h"
+#include "hit_record.h"
 #include "ray.h"
 
 class Hittable {
